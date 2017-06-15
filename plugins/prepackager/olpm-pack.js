@@ -19,12 +19,13 @@ var wrapError = function(err){
 module.exports = function(ret, conf, settings, opt){
     var olpm = fis.config.get('olpm');
     if(olpm.code){
-        var map = {
+        var map = ret.olpm = {
             code : olpm.code,
             files : {
                 layouts : [],
                 units : [],
-                assets : []
+                assets : [],
+                assetsMap: {}
             }
         };
         var isInline = olpm.pack === fis.olpm.PACK_TYPE_INLINE;
@@ -143,16 +144,11 @@ module.exports = function(ret, conf, settings, opt){
                     if(res.css.length){
                         var css = '';
                         res.css.forEach(function(file){
-                            if(isInline){
-                                var attr = opt.optimize ? '' : ' data-path="' + file.subpath + '"';
-                                css += [ '<style' + attr + '>', file.getContent(), '</style>', '' ].join(eof);
-                            } else {
-                                var comment = opt.optimize ? '' : '/*-[' + file.subpath + ']-*/';
-                                css += [ comment, file.getContent(), '' ].join(eof);
-                            }
+                            var comment = opt.optimize ? '' : '/*-[' + file.subpath + ']-*/';
+                            css += [ comment, file.getContent(), '' ].join(eof);
                         });
                         if(isInline){
-                            styles = css;
+                            styles = '<style>' + css + '</style>';
                         } else {
                             var cssfile = fis.file(fis.project.getProjectPath('pkg/' + file.filename + '.css'));
                             cssfile.setContent(css);
@@ -163,6 +159,7 @@ module.exports = function(ret, conf, settings, opt){
                                 file : opt.md5 ? cssfile.getHashRelease() : cssfile.release,
                                 type : cssfile.rExt.replace(/^\./, '')
                             });
+                            map.files.assetsMap[cssfile.subpath] = 1;
                         }
                     }
 
@@ -170,16 +167,11 @@ module.exports = function(ret, conf, settings, opt){
                         //pack js
                         var js = '';
                         res.js.forEach(function(file){
-                            if(isInline){
-                                var attr = opt.optimize ? '' : ' data-path="' + file.subpath + '"';
-                                js += [ '<script' + attr + '>', file.getContent(), '</script>', '' ].join(eof);
-                            } else {
-                                var comment = opt.optimize ? '' : '/*-[' + file.subpath + ']-*/';
-                                js += [ comment, file.getContent(), '' ].join(eof);
-                            }
+                            var comment = opt.optimize ? '' : '/*-[' + file.subpath + ']-*/';
+                            js += [ comment, file.getContent(), '' ].join(eof);
                         });
                         if(isInline){
-                            scripts = js;
+                            scripts = '<script>' + js + '</script>';
                         } else {
                             var jsfile = fis.file(fis.project.getProjectPath('pkg/' + file.filename + '.js'));
                             jsfile.setContent(js);
@@ -190,6 +182,7 @@ module.exports = function(ret, conf, settings, opt){
                                 file : opt.md5 ? jsfile.getHashRelease() : jsfile.release,
                                 type : jsfile.rExt.replace(/^\./, '')
                             });
+                            map.files.assetsMap[jsfile.subpath] = 1;
                         }
                     }
                 } else {
@@ -211,6 +204,7 @@ module.exports = function(ret, conf, settings, opt){
                     content = content.replace(/(?=<\/body>)/i, scripts);
                 }
                 file.setContent(content);
+                opt.beforeCompile(file);
                 if(opt.pack) {
                     map.files.layouts.push(getOlpmInfo(file, olpm.code, opt, ret));
                 }
@@ -226,12 +220,6 @@ module.exports = function(ret, conf, settings, opt){
                 });
             }
         });
-        if(opt.pack){
-            var file = fis.file(fis.project.getProjectPath('release.json'));
-            file.setContent(JSON.stringify(map, null, 4));
-            file.compiled = true;
-            ret.pkg[file.subpath] = file;
-        }
     } else if(!olpm.code) {
         fis.log.error('missing project code, use `fis.config.set("olpm.code", value);` in fis-conf.js');
     }

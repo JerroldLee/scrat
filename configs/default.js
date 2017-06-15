@@ -1,36 +1,41 @@
 var plugins = {
     define : require('../plugins/postprocessor/define.js'),
-    uaeConf : require('../plugins/postpackager/uae-conf.js'),
-    frameworkConf : require('../plugins/postpackager/framework-conf.js')
+    uaeConf : require('../plugins/prepackager/uae-conf.js'),
+    frameworkConf : require('../plugins/prepackager/framework-conf.js')
 };
 module.exports = {
     urlPrefix : '',
     project : {
         fileType : {
-            text : 'handlebars, jade, ejs, jsx, styl'
+            text : 'handlebars, jade, ejs, jsx, styl, less, scss, sass'
         }
     },
     modules : {
         parser : {
             handlebars : 'handlebars',
             styl       : 'stylus',
-            md         : 'marked'
+            less       : 'less',
+            md         : 'marked',
+            sass       : 'node-sass',
+            scss       : 'node-sass'
         },
         lint : {
             js: 'jshint'
         },
+        deploy: ['default', 'compress'],
         postprocessor : {
-            js : plugins.define
+            js : [ plugins.define ]
         },
-        postpackager : [
-            plugins.uaeConf,
-            plugins.frameworkConf
-        ]
+        prepackager : [ plugins.uaeConf ],
+        postpackager: [ plugins.frameworkConf ]
     },
     roadmap : {
         ext : {
             jsx : 'js',
-            styl : 'css'
+            styl : 'css',
+            less : 'css',
+            sass : 'css',
+            scss : 'css'
         },
         path : [
             {
@@ -68,7 +73,7 @@ module.exports = {
                 release : '/views/${name}/${version}/$1'
             },
             {
-                reg : /^\/component_modules\/(.*)\.(styl|css)$/i,
+                reg : /^\/component_modules\/(.*)\.(styl|less|css|scss|sass)$/i,
                 id : '$1.css',
                 isMod : true,
                 useSprite : true,
@@ -90,7 +95,7 @@ module.exports = {
                 release : '/public/c/$1'
             },
             {
-                reg : /^\/components\/(.*)\.(styl|css)$/i,
+                reg : /^\/components\/(.*)\.(styl|less|css|scss|sass)$/i,
                 id : '${name}/${version}/$1.css',
                 isMod : true,
                 useSprite : true,
@@ -153,6 +158,25 @@ module.exports = {
                     port : 11211
                 }
             ]
+        }
+    },
+    settings: {
+        spriter: {
+            csssprites: {
+                htmlUseSprite: true,
+                styleReg: /(<style(?:(?=\s)[\s\S]*?["'\s\w\/\-]>|>))([\s\S]*?)(<\/style\s*>|$)/ig
+            }
+        },
+        deploy: {
+            default: {
+                local: {
+                    to: '../dist'
+                }
+           },
+            compress: {
+                zip: {
+                }
+            }
         }
     }
 };

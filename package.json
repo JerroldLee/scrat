@@ -1,31 +1,48 @@
 {
-    "name": "scrat",
-    "version": "0.2.4-10",
-    "description": "uc front-end integrated solution",
-    "main": "index.js",
-    "preferGlobal": true,
-    "bin": {
-        "scrat": "bin/scrat"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [ "fis", "uc" ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/fouber/scrat.git"
-    },
-    "dependencies": {
-        "fis": "1.7.14",
-        "scrat-command-init" : "0.1.1-4",
-        "scrat-command-install" : "0.1.5-1",
-        "scrat-command-server"  : "0.0.11",
-        "scrat-parser-stylus"  : "0.0.4",
-        "fis-lint-jshint": "0.0.9",
-        "fis-parser-marked": "0.0.3",
-        "fis-parser-handlebars" : "0.0.1",
-        "fis-optimizer-html-minifier": "0.0.9"
-    },
-    "author": "fouber",
-    "license": "MIT"
+  "name": "scrat",
+  "version": "0.10.0",
+  "description": "Modular front-end integrated solution for mobile",
+  "main": "index.js",
+  "preferGlobal": true,
+  "bin": {
+    "scrat": "bin/scrat"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "autod": "autod"
+  },
+  "keywords": [
+    "scrat",
+    "webapp",
+    "framework",
+    "mobile",
+    "fis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scrat-team/scrat.git"
+  },
+  "dependencies": {
+    "fis": "~1.10.1",
+    "fis-lint-jshint": "~0.0.10",
+    "fis-optimizer-html-minifier": "~0.0.9",
+    "fis-parser-handlebars": "~0.0.1",
+    "fis-parser-handlebars-3.x": "~0.0.1",
+    "fis-parser-less": "~0.1.3",
+    "fis-parser-marked": "~0.0.6",
+    "fis-parser-node-sass": "~0.2.1",
+    "fis-postprocessor-autoprefixer": "~0.0.5",
+    "scrat-command-init": "~0.1.3",
+    "scrat-command-install": "~0.1.5-2",
+    "scrat-command-server": "~0.0.21",
+    "scrat-deploy-compress": "~0.1.1",
+    "scrat-parser-babel": "~0.0.1",
+    "scrat-parser-stylus": "~0.0.4",
+    "scrat-preprocessor-nightcss": "~0.1.1"
+  },
+  "author": "scrat-team",
+  "license": "MIT",
+  "devDependencies": {
+    "autod": "^2.6.1"
+  }
 }

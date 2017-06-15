@@ -25,7 +25,7 @@ function makeComponentModulesAlias(componentFile, map, ret) {
         //遍历component.json中的dependencies字段
         fis.util.map(json.dependencies, function(name, version){
             //必须使用明确的版本号
-            if(/^\d\./.test(version)){
+            if(/^\d+\./.test(version)){
                 //获取模块名，处理路径分隔符
                 var module_name = name.split('/').join('-');
                 //根据版本号找到模块目录
@@ -115,7 +115,7 @@ module.exports = function (ret, conf, settings, opt){
             views.push(file);
         } else if(file.isMod && (file.isJsLike || file.isCssLike)){
             if(file.isJsLike){
-                var match = file.subpath.match(/^\/components\/(.*?([^\/]+))\/\2\.(js|jsx)$/i);
+                var match = file.subpath.match(/^\/(?:app\/components|components)\/(.*?([^\/]+))\/\2\.(js|jsx)$/i);
                 if(match && match[1] && !map.alias.hasOwnProperty(match[1])){
                     map.alias[match[1]] = id;
                 }
@@ -152,7 +152,7 @@ module.exports = function (ret, conf, settings, opt){
             delete map.deps[id];
         }
     });
-    if(opt.optimize && map.cache){
+    if(map.cache){
         var callback = map.defineCSSCallback || 'require.defineCSS';
         fis.util.map(ret.src, function(subpath, file){
             if(file.isCssLike && file.isMod){
@@ -165,11 +165,18 @@ module.exports = function (ret, conf, settings, opt){
                 ret.pkg[subpath + '.js'] = f;
             }
         });
-    } else {
-        map.cache = false;
     }
     var stringify = JSON.stringify(map, null, opt.optimize ? null : 4);
     views.forEach(function(file){
-        file.setContent(file.getContent().replace(/\b__FRAMEWORK_CONFIG__\b/g, stringify));
+        var content = file.getContent();
+        var hasChange = false;
+        content = content.replace(/\b__FRAMEWORK_CONFIG__\b/g, function(){
+            hasChange = true;
+            return stringify;
+        });
+        if(hasChange){
+            file.setContent(content);
+            opt.beforeCompile(file);
+        }
     });
 };
